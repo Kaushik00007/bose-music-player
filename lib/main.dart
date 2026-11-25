@@ -17,9 +17,6 @@ void main() {
   runApp(const BoseMusicApp());
 }
 
-// ---------------------------------------------------------------------------
-// Design tokens (visual only)
-// ---------------------------------------------------------------------------
 const Color _kTeal = Color(0xFF00D6AA);
 const Color _kTealButton = Color(0xFF00C8A0);
 const Color _kSurface = Color(0xFF16181D);
@@ -50,10 +47,8 @@ class BoseMusicApp extends StatelessWidget {
           inactiveTrackColor: Colors.grey.shade800,
           thumbColor: _kTeal,
           overlayColor: const Color(0x3300D6AA),
-          // Hide the dense tick marks on the EQ sliders for a cleaner look.
           activeTickMarkColor: Colors.transparent,
           inactiveTickMarkColor: Colors.transparent,
-          // Clear disabled state (e.g. seek bar before a track has loaded).
           disabledActiveTrackColor: const Color(0x4D00D6AA),
           disabledInactiveTrackColor: Colors.grey.shade900,
           disabledThumbColor: Colors.grey.shade700,
@@ -315,8 +310,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
             constraints: const BoxConstraints(maxWidth: 650),
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Responsive sizing: artwork scales with window height so the
-                // EQ stays visible on 1080p; smaller windows fall back to scroll.
+
                 final h = constraints.maxHeight;
                 final w = constraints.maxWidth;
                 final compact = h < 780;
@@ -625,7 +619,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   }
 }
 
-/// Secondary round control (previous / next). Fixed size so both match.
+/// Secondary round control (previous / next)
 class _ControlButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onPressed;
@@ -662,7 +656,7 @@ class _ControlButton extends StatelessWidget {
   }
 }
 
-/// Primary round control. Same circular language as the secondary buttons.
+
 class _PlayPauseButton extends StatelessWidget {
   final bool playing;
   final bool loading;
