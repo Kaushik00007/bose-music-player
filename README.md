@@ -7,7 +7,7 @@ It combines core playback controls with a real-time, three-band equalizer that m
 **Platform targeted:** 🐧 Linux Desktop
 
 ## 🎬 Demo Video
-▶️ **[Watch the demo video](ADD_YOUR_VIDEO_LINK_HERE)**
+▶️ **[Watch the demo video](https://drive.google.com/file/d/1a7znIqLF9DUGhZwPs-RgotSayNFaO6Or/view?usp=sharing)**
 
 ## 🎯 Features
 - **Bundled Tracks** – Four audio tracks included with the application (loaded from assets).
