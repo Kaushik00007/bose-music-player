@@ -1,4 +1,3 @@
-
 import 'dart:async';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -50,6 +49,24 @@ class PlayerScreen extends StatefulWidget {
 class _PlayerScreenState extends State<PlayerScreen> {
   late final MiniaudioPlayer player;
 
+  static const List<String> _tracks = [
+    'assets/musics/sample.mp3',
+    'assets/musics/track2.mp3',
+    'assets/musics/track3.mp3',
+    'assets/musics/track4.mp3',
+  ];
+
+  static const List<String> _trackTitles = [
+    'Sample Track',
+    'Midnight Drive',
+    'Neon Dreams',
+    'Electric Pulse',
+  ];
+
+  int _currentTrackIndex = 0;
+  bool _isSwitchingTrack = false;
+  StreamSubscription<bool>? _completedSubscription;
+
   bool loading = true;
   bool playing = false;
   String? errorMessage;
@@ -62,14 +79,53 @@ class _PlayerScreenState extends State<PlayerScreen> {
   void initState() {
     super.initState();
     player = MiniaudioPlayer();
-    _loadTrack();
+    _listenToCompletion();
+    _loadTrack(_currentTrackIndex);
   }
 
-  Future<void> _loadTrack() async {
+  void _listenToCompletion() {
+    _completedSubscription = player.stream.completed.listen((completed) {
+      if (completed && mounted && !_isSwitchingTrack) {
+        _playNextTrack();
+      }
+    });
+  }
+
+  Future<void> _loadTrack(int index, {bool autoPlay = false}) async {
+    if (_isSwitchingTrack) return;
+    if (index < 0 || index >= _tracks.length) return;
+
+    _isSwitchingTrack = true;
+
     try {
+      if (!mounted) return;
+      setState(() {
+        loading = true;
+        errorMessage = null;
+      });
+
+      final currentEq = player.state.equalizer;
+
       await player.action.open(
-        AudioSource.asset('assets/musics/sample.mp3'),
+        AudioSource.asset(_tracks[index]),
       );
+
+      if (!mounted) return;
+
+      if (currentEq != Equalizer.flat) {
+        await player.action.setEqualizer(currentEq);
+      }
+
+      _currentTrackIndex = index;
+
+      if (autoPlay) {
+        await player.action.play();
+        if (mounted) {
+          setState(() => playing = true);
+        }
+      } else {
+        await player.action.seek(Duration.zero);
+      }
 
       if (!mounted) return;
       setState(() => loading = false);
@@ -77,9 +133,21 @@ class _PlayerScreenState extends State<PlayerScreen> {
       if (!mounted) return;
       setState(() {
         loading = false;
-        errorMessage = e.toString();
+        errorMessage = 'Failed to load track: $e';
       });
+    } finally {
+      _isSwitchingTrack = false;
     }
+  }
+
+  Future<void> _playNextTrack() async {
+    final nextIndex = (_currentTrackIndex + 1) % _tracks.length;
+    await _loadTrack(nextIndex, autoPlay: true);
+  }
+
+  Future<void> _playPreviousTrack() async {
+    final prevIndex = (_currentTrackIndex - 1 + _tracks.length) % _tracks.length;
+    await _loadTrack(prevIndex, autoPlay: true);
   }
 
   Future<void> _togglePlayback() async {
@@ -175,6 +243,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void dispose() {
+    _completedSubscription?.cancel();
     unawaited(player.dispose());
     super.dispose();
   }
@@ -231,10 +300,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   ),
                 ),
                 const SizedBox(height: 28),
-                const Text(
-                  'Sample Track',
+                Text(
+                  _trackTitles[_currentTrackIndex],
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
                   ),
@@ -296,9 +365,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      onPressed: null,
+                      onPressed: loading || _isSwitchingTrack
+                          ? null
+                          : _playPreviousTrack,
                       icon: const Icon(Icons.skip_previous_rounded),
                       iconSize: 38,
+                      color: (loading || _isSwitchingTrack)
+                          ? Colors.grey.shade700
+                          : null,
                     ),
                     const SizedBox(width: 18),
                     FilledButton(
@@ -326,9 +400,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     ),
                     const SizedBox(width: 18),
                     IconButton(
-                      onPressed: null,
+                      onPressed: loading || _isSwitchingTrack
+                          ? null
+                          : _playNextTrack,
                       icon: const Icon(Icons.skip_next_rounded),
                       iconSize: 38,
+                      color: (loading || _isSwitchingTrack)
+                          ? Colors.grey.shade700
+                          : null,
                     ),
                   ],
                 ),
