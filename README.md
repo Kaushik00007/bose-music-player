@@ -6,9 +6,6 @@ It combines core playback controls with a real-time, three-band equalizer that m
 
 **Platform targeted:** 🐧 Linux Desktop
 
-## 🎬 Demo Video
-▶️ **[Watch the demo video](https://drive.google.com/file/d/1a7znIqLF9DUGhZwPs-RgotSayNFaO6Or/view?usp=sharing)**
-
 ## 🎯 Features
 - **Bundled Tracks** – Four audio tracks included with the application (loaded from assets).
 - **Playback Controls** – Play, pause and resume playback.
@@ -144,9 +141,6 @@ AI tools were used as assistants during development:
 - **Claude** – UI spacing/layout polish and README help.
 
 I reviewed and tested all changes and made the final design decisions.
-
-## 📄 License
-This project was developed as an internship practical challenge.
 
 ## 📩 Contact
 For queries or collaboration, reach out via:
